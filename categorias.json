@@ -1,0 +1,5 @@
+{
+  "Frutas": ["Maçã", "Banana", "Laranja"],
+  "Carros": ["Sedan", "SUV", "Esportivo"],
+  "Jogos": ["RPG", "Futebol", "Xadrez"]
+}
