@@ -58,3 +58,26 @@ nav a:hover {
 .item:hover {
   background: #ddd;
 }
+
+.item.selecionado {
+  background: #aee5a3;
+}
+
+#selecionados {
+  margin-top: 30px;
+  padding: 15px;
+  background: #f9f9f9;
+  border-top: 2px solid #ccc;
+}
+
+#lista-selecionados {
+  margin-top: 10px;
+}
+
+#lista-selecionados .categoria-bloco {
+  margin-bottom: 10px;
+}
+
+#lista-selecionados h4 {
+  margin: 5px 0;
+}
