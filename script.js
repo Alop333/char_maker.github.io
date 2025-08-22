@@ -31,18 +31,18 @@ async function carregarCategorias() {
     h2.textContent = categoria;
     div.appendChild(h2);
 
-    selecionados[categoria] = []; // inicializa categoria
+    selecionados[categoria] = null; // apenas 1 item por categoria
 
     data[categoria].forEach((item, itemIndex) => {
       const divItem = document.createElement("div");
       divItem.classList.add("item");
       divItem.textContent = item;
 
-      divItem.onclick = () => toggleItem(categoria, item, divItem);
+      divItem.onclick = () => selecionarUnico(categoria, item, divItem);
 
-      // ✅ Seleciona automaticamente o primeiro item de cada categoria
+      // ✅ Seleciona automaticamente o primeiro item
       if (itemIndex === 0) {
-        selecionados[categoria].push(item);
+        selecionados[categoria] = item;
         divItem.classList.add("selecionado");
       }
 
@@ -62,19 +62,17 @@ function showCategory(categoryId) {
   document.getElementById(categoryId).classList.add("active");
 }
 
-function toggleItem(categoria, item, elemento) {
-  let lista = selecionados[categoria];
-  const index = lista.indexOf(item);
+function selecionarUnico(categoria, item, elemento) {
+  // desmarca todos os itens dessa categoria
+  document.querySelectorAll(`#${categoria} .item`).forEach(el => {
+    el.classList.remove("selecionado");
+  });
 
-  if (index === -1) {
-    // adicionar
-    lista.push(item);
-    elemento.classList.add("selecionado");
-  } else {
-    // remover
-    lista.splice(index, 1);
-    elemento.classList.remove("selecionado");
-  }
+  // marca o item clicado
+  elemento.classList.add("selecionado");
+
+  // atualiza seleção
+  selecionados[categoria] = item;
 
   atualizarSelecionados();
 }
@@ -84,7 +82,7 @@ function atualizarSelecionados() {
   container.innerHTML = "";
 
   Object.keys(selecionados).forEach(categoria => {
-    if (selecionados[categoria].length > 0) {
+    if (selecionados[categoria]) {
       const bloco = document.createElement("div");
       bloco.classList.add("categoria-bloco");
 
@@ -92,15 +90,11 @@ function atualizarSelecionados() {
       titulo.textContent = categoria + ":";
       bloco.appendChild(titulo);
 
-      const lista = document.createElement("div");
-      selecionados[categoria].forEach(item => {
-        const span = document.createElement("span");
-        span.textContent = "✔️ " + item;
-        span.style.display = "block";
-        lista.appendChild(span);
-      });
+      const span = document.createElement("span");
+      span.textContent = "✔️ " + selecionados[categoria];
+      span.style.display = "block";
+      bloco.appendChild(span);
 
-      bloco.appendChild(lista);
       container.appendChild(bloco);
     }
   });
