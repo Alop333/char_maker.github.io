@@ -1,6 +1,6 @@
 let selecionados = {}; // Armazena item escolhido por categoria
 
-// Função para gerar IDs seguros (sem espaços, acentos, caracteres especiais)
+// Função para gerar IDs seguros (sem espaços, acentos, maiúsculas, etc.)
 function gerarIdSeguro(texto) {
   return texto
     .normalize("NFD")                // separa acentos
@@ -43,14 +43,20 @@ async function carregarCategorias() {
     h2.textContent = categoria;
     div.appendChild(h2);
 
-    selecionados[categoria] = null; // começa sem nenhum item
+    selecionados[categoria] = null; // apenas 1 item por categoria
 
-    data[categoria].forEach(item => {
+    data[categoria].forEach((item, itemIndex) => {
       const divItem = document.createElement("div");
       divItem.classList.add("item");
       divItem.textContent = item;
 
       divItem.onclick = () => selecionarUnico(categoria, categoriaId, item, divItem);
+
+      // ✅ Seleciona automaticamente o primeiro item
+      if (itemIndex === 0) {
+        selecionados[categoria] = item;
+        divItem.classList.add("selecionado");
+      }
 
       div.appendChild(divItem);
     });
@@ -58,7 +64,7 @@ async function carregarCategorias() {
     content.appendChild(div);
   });
 
-  atualizarSelecionados(); // render inicial
+  atualizarSelecionados(); // renderiza seleção inicial
 }
 
 function showCategory(categoryId) {
@@ -69,21 +75,16 @@ function showCategory(categoryId) {
 }
 
 function selecionarUnico(categoria, categoriaId, item, elemento) {
-  const jaSelecionado = selecionados[categoria] === item;
-
-  // Desmarca todos os itens da categoria
+  // desmarca todos os itens dessa categoria
   document.querySelectorAll(`#${categoriaId} .item`).forEach(el => {
     el.classList.remove("selecionado");
   });
 
-  if (jaSelecionado) {
-    // Se clicou de novo no mesmo -> remove seleção
-    selecionados[categoria] = null;
-  } else {
-    // Caso contrário -> marca novo item
-    elemento.classList.add("selecionado");
-    selecionados[categoria] = item;
-  }
+  // marca o item clicado
+  elemento.classList.add("selecionado");
+
+  // atualiza seleção
+  selecionados[categoria] = item;
 
   atualizarSelecionados();
 }
