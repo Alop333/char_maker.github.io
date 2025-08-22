@@ -31,19 +31,28 @@ async function carregarCategorias() {
     h2.textContent = categoria;
     div.appendChild(h2);
 
-    data[categoria].forEach(item => {
+    selecionados[categoria] = []; // inicializa categoria
+
+    data[categoria].forEach((item, itemIndex) => {
       const divItem = document.createElement("div");
       divItem.classList.add("item");
       divItem.textContent = item;
 
       divItem.onclick = () => toggleItem(categoria, item, divItem);
 
+      // ✅ Seleciona automaticamente o primeiro item de cada categoria
+      if (itemIndex === 0) {
+        selecionados[categoria].push(item);
+        divItem.classList.add("selecionado");
+      }
+
       div.appendChild(divItem);
     });
 
     content.appendChild(div);
-    selecionados[categoria] = []; // inicializa categoria
   });
+
+  atualizarSelecionados(); // renderiza seleção inicial
 }
 
 function showCategory(categoryId) {
