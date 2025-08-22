@@ -93,7 +93,7 @@ function atualizarSelecionados() {
   container.innerHTML = "";
 
   Object.keys(selecionados).forEach(categoria => {
-    if (selecionados[categoria] > 0) {
+    if (selecionados[categoria]) {
       const bloco = document.createElement("div");
       bloco.classList.add("categoria-bloco");
 
