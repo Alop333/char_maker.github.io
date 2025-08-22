@@ -1,0 +1,60 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Menu horizontal */
+nav {
+  background-color: #333;
+  padding: 10px;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+nav li {
+  margin-right: 20px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  padding: 8px 12px;
+  display: block;
+}
+
+nav a:hover {
+  background-color: #575757;
+  border-radius: 5px;
+}
+
+/* Conteúdo */
+.content {
+  padding: 20px;
+}
+
+.category {
+  display: none; /* começa escondido */
+}
+
+.active {
+  display: block; /* mostra a categoria selecionada */
+}
+
+.item {
+  margin: 5px 0;
+  padding: 10px;
+  background: #f0f0f0;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.item:hover {
+  background: #ddd;
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Site de Categorias</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Menu -->
+  <nav>
+    <ul>
+      <li><a href="#" onclick="showCategory('frutas')">Frutas</a></li>
+      <li><a href="#" onclick="showCategory('carros')">Carros</a></li>
+      <li><a href="#" onclick="showCategory('jogos')">Jogos</a></li>
+    </ul>
+  </nav>
+
+  <!-- Conteúdo -->
+  <div class="content">
+    <div id="frutas" class="category active">
+      <h2>Frutas</h2>
+      <div class="item">🍎 Maçã</div>
+      <div class="item">🍌 Banana</div>
+      <div class="item">🍊 Laranja</div>
+    </div>
+
+    <div id="carros" class="category">
+      <h2>Carros</h2>
+      <div class="item">🚗 Sedan</div>
+      <div class="item">🚙 SUV</div>
+      <div class="item">🏎️ Esportivo</div>
+    </div>
+
+    <div id="jogos" class="category">
+      <h2>Jogos</h2>
+      <div class="item">🎮 RPG</div>
+      <div class="item">⚽ Futebol</div>
+      <div class="item">♟️ Xadrez</div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
