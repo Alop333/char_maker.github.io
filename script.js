@@ -1,4 +1,14 @@
-let selecionados = {}; // Armazena itens escolhidos por categoria
+let selecionados = {}; // Armazena item escolhido por categoria
+
+// Função para gerar IDs seguros (sem espaços, acentos, maiúsculas, etc.)
+function gerarIdSeguro(texto) {
+  return texto
+    .normalize("NFD")                // separa acentos
+    .replace(/[\u0300-\u036f]/g, "") // remove acentos
+    .replace(/\s+/g, "_")            // troca espaços por "_"
+    .replace(/[^\w-]/g, "")          // remove símbolos
+    .toLowerCase();
+}
 
 async function carregarCategorias() {
   const response = await fetch("categorias.json");
@@ -12,18 +22,20 @@ async function carregarCategorias() {
   selecionados = {};
 
   Object.keys(data).forEach((categoria, index) => {
+    const categoriaId = gerarIdSeguro(categoria);
+
     // Criar menu
     const li = document.createElement("li");
     const link = document.createElement("a");
     link.href = "#";
     link.textContent = categoria;
-    link.onclick = () => showCategory(categoria);
+    link.onclick = () => showCategory(categoriaId);
     li.appendChild(link);
     nav.appendChild(li);
 
     // Criar seção
     const div = document.createElement("div");
-    div.id = categoria;
+    div.id = categoriaId;
     div.classList.add("category");
     if (index === 0) div.classList.add("active");
 
@@ -38,7 +50,7 @@ async function carregarCategorias() {
       divItem.classList.add("item");
       divItem.textContent = item;
 
-      divItem.onclick = () => selecionarUnico(categoria, item, divItem);
+      divItem.onclick = () => selecionarUnico(categoria, categoriaId, item, divItem);
 
       // ✅ Seleciona automaticamente o primeiro item
       if (itemIndex === 0) {
@@ -62,9 +74,9 @@ function showCategory(categoryId) {
   document.getElementById(categoryId).classList.add("active");
 }
 
-function selecionarUnico(categoria, item, elemento) {
+function selecionarUnico(categoria, categoriaId, item, elemento) {
   // desmarca todos os itens dessa categoria
-  document.querySelectorAll(`#${categoria} .item`).forEach(el => {
+  document.querySelectorAll(`#${categoriaId} .item`).forEach(el => {
     el.classList.remove("selecionado");
   });
 
