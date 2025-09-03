@@ -6,10 +6,22 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="color-popup" class="popup">Sou um popup</div>
+  <div id="color-popup" class="popup"></div>
   <div class="container">
     <div class="coluna image">
       <div id="galeria-imagens"></div>
+      <div id="button_wrapper">
+        <div id="button_wrapper_dir">
+          <input type="button" id="Download" value="Download">
+          <input type="button" id="Save" value="Save">
+        </div>
+        <input type="text" id="Name" value="Nome Personagem">
+        <div id="button_wrapper_esq">
+          <input type="file" id="Open" accept="application/json">
+          <label for="Open" class="meu-botao">Open</label>
+          <input type="button" id="Reset" value="Reset">
+        </div>
+      </div>
     </div>
 
     <div class="coluna picker">

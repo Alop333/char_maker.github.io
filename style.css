@@ -5,7 +5,7 @@ body {
 
 .container {
   display: grid;
-  grid-template-columns: 8fr 8fr 1fr; 
+  grid-template-columns: 6fr 8fr 1fr; 
   height: 100vh; 
 }
 
@@ -15,8 +15,51 @@ body {
 }
 
 .coluna.image {
+  display: grid;
+  gap: 55px;
+  bottom: 100%;
   background-color: #f4f4f4;
   border-right: 1px solid #ccc;
+  overflow: hidden;
+}
+
+#button_wrapper {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  border-right: #ccc;
+}
+
+#button_wrapper_dir {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+#button_wrapper_esq {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 15px;
+}
+
+input[type="text"] {
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 36px;
+  background-color: #f9f9f9;
+  justify-items: center;
+  align-self: center;
+  color: #333;
+}
+
+input[type="text"]:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  outline: none; 
 }
 
 #galeria-imagens {
@@ -40,6 +83,9 @@ body {
   pointer-events: none;       
 }
 
+
+/*COLUNA DO MEIO*/
+
 .coluna.picker {
   background-color: #fff;
 }
@@ -50,10 +96,11 @@ nav ul {
   display: flex;
   overflow-x: auto;
   gap: 15px;
-  height: 110px;
-  padding: 0;
+  height: 115px;
+  padding: 5px;
   margin: 0 0 20px 0;
   scrollbar-width: thin;
+  align-items: center;
 }
 
 nav ul::-webkit-scrollbar {
@@ -72,7 +119,7 @@ nav a {
 }
 
 nav a:hover {
-  border: 1px solid #007BFF;
+  outline: 2px solid #007BFF;
 }
 
 .category {
@@ -91,7 +138,7 @@ nav a:hover {
 
 .grid-itens {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
 }
 
 .item {
@@ -123,6 +170,9 @@ nav a:hover {
 #lista-selecionados {
   display: none;
 }
+
+
+/*POPUP DE CORES*/
 
 #color-popup {
   display: none;
@@ -165,6 +215,8 @@ nav a:hover {
   border-radius: 4px;
 }
 
+/*COLUNA DA ESQUERDA*/
+
 .coluna.button {
   place-items: center;
   background-color: #f4f4f4;
@@ -197,10 +249,6 @@ input[type="color"] {
   border: 2px solid #333; 
 }
 
-#Lock{
-  display: flex;
-}
-
 input[type="button"] {
   background-color: #0099ff;
   color: white;
@@ -214,11 +262,36 @@ input[type="button"] {
   transition: 0.3s;
 }
 
+input[type="file"] {
+  display: none;
+}
+
+.meu-botao{
+  background-color: #0099ff;
+  display: flex;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  width: 55px;
+  height: 65px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+  justify-items: center;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.meu-botao:hover{
+  outline: 2px solid black;
+}
+
 #Lock.botao-inativo {
     background-color: red;
     color: black;
 }
 
 input[type="button"]:hover {
-  border: 2px solid black;
+  outline: 2px solid black;
 }

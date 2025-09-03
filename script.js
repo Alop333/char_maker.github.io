@@ -7,7 +7,7 @@ let idParaCategoria = {};       // { categoriaIdSeguro: "Categoria Original" }
 let corCat = {};
 let categoriaAtiva = null;
 let old_color = null;
-const cores = ["#ffffff"];
+let cores = ["#ffffff"];
 
 const color_ref = 
 ["#ffffff","#e8e8e8","#d1d1d1","#bababa","#a3a3a3","#8c8c8c","#757575","#5e5e5e","#474747","#303030","#191919","#020202",
@@ -134,13 +134,46 @@ async function init() {
 
   content.addEventListener("click", onItemClick);
 
-  atualizarSelecionados();
+  const salvo = localStorage.getItem("estadoSite");
+  if (salvo) {
+    const estado = JSON.parse(salvo);
+    selecionados = estado.selecionados || {};
+    corCat = estado.corCat || {};
+    cores = estado.cores || ["#ffffff"];
+  }
+
   atualizarGaleria();
   criarPopupCores();
+  updateMenuCores();
 
   if (categorias.length > 0) showCategory(idSeguro(categorias[0]));
-  updateMenuCores()
+}
 
+async function reset() {
+  const res = await fetch("categorias.json");
+  const json = await res.json();
+  dados = Object.assign({}, ...json.Categoria);
+
+  const categorias = Object.keys(dados);
+  categorias.forEach((categoria) => {
+    const inicial = dados[categoria][0];
+    const catId = idSeguro(categoria);
+    const alvo = document.getElementById(catId);
+
+    const lock = document.getElementById("Lock");
+    alvo.dataset.lock = "true";
+    const ativo = alvo.dataset.lock === "true";
+    lock.classList.toggle("botao", ativo);
+    lock.classList.toggle("botao-inativo", !ativo);
+    
+    marcarVisual(catId, Number(inicial));
+    selecionados[categoria] = Number(inicial) || 0;
+    corCat[categoria] = hexToRgb("#ffffff");
+  });
+  cores = ["#ffffff"];
+
+  atualizarGaleria();
+  updateMenuCores();
 }
 
 function criarPopupCores() {
@@ -231,6 +264,10 @@ function showCategory(catId) {
   categoriaAtiva = catId;
   if (alvo) alvo.classList.add("active");
   lock.style.display = (alvo.dataset.group === "0") ? "none" : "flex";
+
+  const ativo = alvo.dataset.lock === "true";
+  lock.classList.toggle("botao", ativo);
+  lock.classList.toggle("botao-inativo", !ativo);
 }
 
 function onItemClick(e) {
@@ -247,7 +284,6 @@ function onItemClick(e) {
   selecionados[categoria] = novoValor;
   marcarVisual(catId, novoValor);
 
-  atualizarSelecionados();
   atualizarGaleria();
 }
 
@@ -268,28 +304,13 @@ function marcarVisual(catId, valor) {
   }
 }
 
-function atualizarSelecionados() {
-  const cont = document.getElementById("lista-selecionados");
-  cont.innerHTML = "";
-
-  Object.keys(selecionados).forEach(categoria => {
-    const val = Number(selecionados[categoria] || 0);
-    if (val > 0) {
-      const bloco = document.createElement("div");
-      bloco.className = "categoria-bloco";
-
-      const h4 = document.createElement("h4");
-      h4.textContent = categoria + ":";
-      bloco.appendChild(h4);
-
-      const span = document.createElement("span");
-      span.textContent = "✔️ " + val;
-      span.style.display = "block";
-      bloco.appendChild(span);
-
-      cont.appendChild(bloco);
-    }
-  });
+function updateEstado(){
+  const estado = {
+    selecionados,
+    corCat,
+    cores
+  };
+  localStorage.setItem("estadoSite", JSON.stringify(estado));
 }
 
 function hexToRgb(hex) {
@@ -388,6 +409,7 @@ async function atualizarGaleria() {
   const gal = document.getElementById("galeria-imagens");
   const camadas = await carregarCamadasSelecionadas(selecionados);
   renderizarCamadas(gal, camadas);
+  updateEstado();
 }
 
 /*document.getElementById("colorSubmit").addEventListener("click", () => {
@@ -445,6 +467,74 @@ document.getElementById("Lock").addEventListener("click", () => {
   botao.classList.toggle("botao", ativo);
   botao.classList.toggle("botao-inativo", !ativo);
 });
+
+document.getElementById("Download").addEventListener("click", () => {
+  const container = document.getElementById("galeria-imagens");
+
+  const width = container.offsetWidth;
+  const height = container.offsetHeight;
+
+  const finalCanvas = document.createElement("canvas");
+  finalCanvas.width = width;
+  finalCanvas.height = height;
+  const ctx = finalCanvas.getContext("2d");
+
+  const elementos = container.querySelectorAll("img");
+
+  elementos.forEach(el => {
+    if (el.tagName.toLowerCase() === "img") {
+      ctx.drawImage(el, 0, 0, width, height);
+    } else if (el.tagName.toLowerCase() === "canvas") {
+      ctx.drawImage(el, 0, 0, width, height);
+    }
+  });
+
+  const link = document.createElement("a");
+  link.download = document.getElementById("Name").value;
+  link.href = finalCanvas.toDataURL("image/png");
+  link.click();
+});
+
+document.getElementById("Save").addEventListener("click", () => {
+  const estado = {
+    selecionados,
+    corCat,
+    cores
+  };
+
+  const blob = new Blob([JSON.stringify(estado, null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = document.getElementById("Name").value + ".json";
+  link.click();
+});
+
+document.getElementById("Open").addEventListener("change", (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  console.log("oi");
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const conteudo = JSON.parse(e.target.result);
+
+    selecionados = conteudo.selecionados || {};
+    corCat = conteudo.corCat || {};
+    cores = conteudo.cores || {};
+
+    atualizarGaleria();
+    updateMenuCores();
+
+    const color_p = document.getElementById("color");
+    color_p.value = "#ffffff";
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById("Reset").addEventListener("click", (event) => {
+  reset();
+})
 
 
 window.addEventListener("DOMContentLoaded", init);
