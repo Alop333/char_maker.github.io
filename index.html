@@ -1,23 +1,30 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Site de Categorias</title>
+  <title>Character Maker</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="color-popup" class="popup">Sou um popup</div>
+  <div class="container">
+    <div class="coluna image">
+      <div id="galeria-imagens"></div>
+    </div>
 
-  <!-- Menu (será preenchido pelo JS) -->
-  <nav>
-    <ul></ul>
-  </nav>
+    <div class="coluna picker">
+      <nav>
+        <ul></ul>
+      </nav>
+      <div class="content"></div>
+      <div id="lista-selecionados"></div>
+    </div>
 
-  <!-- Conteúdo (será preenchido pelo JS) -->
-  <div class="content"></div>
-
-  <div id="selecionados">
-    <h3>Itens selecionados:</h3>
-    <div id="lista-selecionados"></div>
+    <div class="coluna button">
+      <input type="button" id="Lock" value="Lock">
+      <div id="menu-cores"></div>
+      <input type="button" id="colorPop" value="Color">
+    </div>
   </div>
 
   <script src="script.js"></script>
