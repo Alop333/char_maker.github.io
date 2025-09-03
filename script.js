@@ -1,9 +1,8 @@
-// Estado
-let dados = {};                 // conteúdo do JSON
+let dados = {};                
 let printOrder = {};
-let selecionados = {};          // { Categoria: numeroSelecionado }
+let selecionados = {};         
 let removeList = {};
-let idParaCategoria = {};       // { categoriaIdSeguro: "Categoria Original" }
+let idParaCategoria = {};       
 let corCat = {};
 let categoriaAtiva = null;
 let old_color = null;
@@ -43,8 +42,6 @@ async function init() {
     printOrder[index] = item; 
   });
 
-  //console.log(printOrder);
-
   const navUl   = el("nav ul");
   const content = el(".content");
 
@@ -67,14 +64,16 @@ async function init() {
     a.addEventListener("click", (e) => {
       e.preventDefault();
       showCategory(catId);
+      document.querySelectorAll("nav a").forEach(b => b.classList.remove("selecionado"));
+      a.classList.add("selecionado");
     });
+    if (idxCat === 0) a.classList.add("selecionado");
     const img = document.createElement("img");
     img.src = `data/${enc(categoria)}/${enc(categoria)}.png`;
     img.alt = `${categoria}`;
     a.appendChild(img);
 
     li.appendChild(a);
-
     navUl.appendChild(li);
 
     const sec = document.createElement("div");
@@ -90,35 +89,24 @@ async function init() {
 
     const wrap = document.createElement("div");
     wrap.className = "grid-itens"; 
-    for (let i = 1; i <= quantidade; i++) {
+    let i = (remove === true) ? 0 : 1;
+
+    for (i; i <= quantidade; i++) {
       const item = document.createElement("div");
       item.className = "item";
       item.textContent = String(i);
       item.dataset.index = String(i);
       item.dataset.catid = catId;
 
-      if (remove === true){
-      item.addEventListener("mouseover", () => {
-        if (item.classList.contains("selecionado")){
-          item.style.background = "#FF0000";
-          item.style.color = "white";
-          item.style.borderColor = "#550000";
-        }
-      });
-      item.addEventListener("mouseout", () => {
-        item.style.background = "";
-        item.style.color = "";
-        item.style.borderColor = "";
-      });
-      }
-
       item.setAttribute("role", "button");
       item.setAttribute("aria-pressed", "false");
 
-      const img = document.createElement("img");
-      img.src = `data/${enc(categoria)}/Icons/${i}.png`;
-      img.alt = `${categoria} - ${i}`;
-      item.appendChild(img);
+      if (i > 0){
+        const img = document.createElement("img");
+        img.src = `data/${enc(categoria)}/Icons/${i}.png`;
+        img.alt = `${categoria} - ${i}`;
+        item.appendChild(img);
+      }
 
       wrap.appendChild(item);
     }
@@ -140,6 +128,12 @@ async function init() {
     selecionados = estado.selecionados || {};
     corCat = estado.corCat || {};
     cores = estado.cores || ["#ffffff"];
+    document.getElementById("Name").value = estado.nome;
+
+    categorias.forEach((categoria) => {
+      const catId = idSeguro(categoria);
+      marcarVisual(catId, selecionados[categoria]);
+    });
   }
 
   atualizarGaleria();
@@ -171,6 +165,7 @@ async function reset() {
     corCat[categoria] = hexToRgb("#ffffff");
   });
   cores = ["#ffffff"];
+  document.getElementById("Name").value = "Nome Personagem";
 
   atualizarGaleria();
   updateMenuCores();
@@ -283,7 +278,6 @@ function onItemClick(e) {
 
   selecionados[categoria] = novoValor;
   marcarVisual(catId, novoValor);
-
   atualizarGaleria();
 }
 
@@ -305,10 +299,13 @@ function marcarVisual(catId, valor) {
 }
 
 function updateEstado(){
+  const nome = document.getElementById("Name").value;
+
   const estado = {
     selecionados,
     corCat,
-    cores
+    cores,
+    nome
   };
   localStorage.setItem("estadoSite", JSON.stringify(estado));
 }
@@ -513,8 +510,6 @@ document.getElementById("Open").addEventListener("change", (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
-  console.log("oi");
-
   const reader = new FileReader();
   reader.onload = (e) => {
     const conteudo = JSON.parse(e.target.result);
@@ -523,11 +518,19 @@ document.getElementById("Open").addEventListener("change", (event) => {
     corCat = conteudo.corCat || {};
     cores = conteudo.cores || {};
 
+    const categorias = Object.keys(selecionados);
+    categorias.forEach((categoria) => {
+      const catId = idSeguro(categoria);
+      marcarVisual(catId, selecionados[categoria]);
+    });
+
     atualizarGaleria();
     updateMenuCores();
 
     const color_p = document.getElementById("color");
     color_p.value = "#ffffff";
+    const name = file.name.split('.');
+    document.getElementById("Name").value = name[0]; 
   };
   reader.readAsText(file);
 });

@@ -118,6 +118,10 @@ nav a {
   cursor: pointer;   
 }
 
+nav a.selecionado {
+  outline: 2px solid black;
+}
+
 nav a:hover {
   outline: 2px solid #007BFF;
 }
