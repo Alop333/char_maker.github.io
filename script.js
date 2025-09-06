@@ -61,14 +61,17 @@ async function init() {
     const a  = document.createElement("a");
     a.href = "#";
     a.textContent = categoria;
+
     a.addEventListener("click", (e) => {
       e.preventDefault();
       showCategory(catId);
       document.querySelectorAll("nav a").forEach(b => b.classList.remove("selecionado"));
       a.classList.add("selecionado");
     });
+
     if (idxCat === 0) a.classList.add("selecionado");
     const img = document.createElement("img");
+    img.classList.add("menu");
     img.src = `data/${enc(categoria)}/${enc(categoria)}.png`;
     img.alt = `${categoria}`;
     a.appendChild(img);
@@ -94,7 +97,6 @@ async function init() {
     for (i; i <= quantidade; i++) {
       const item = document.createElement("div");
       item.className = "item";
-      item.textContent = String(i);
       item.dataset.index = String(i);
       item.dataset.catid = catId;
 
@@ -103,6 +105,7 @@ async function init() {
 
       if (i > 0){
         const img = document.createElement("img");
+        img.classList.add("icon");
         img.src = `data/${enc(categoria)}/Icons/${i}.png`;
         img.alt = `${categoria} - ${i}`;
         item.appendChild(img);
@@ -428,11 +431,10 @@ document.getElementById("colorPop").addEventListener("click", () => {
 
   if (popup.style.display === "grid"){
     const color_p = document.getElementById("color");
-    color_p.value = old_color;
-    corCat[idParaCategoria[categoriaAtiva]] = hexToRgb(old_color);
+    corCat[idParaCategoria[categoriaAtiva]] = old_color;
     atualizarGaleria();
   } else{
-    old_color = document.getElementById("color").value;
+    old_color = corCat[idParaCategoria[categoriaAtiva]];
   }
 
   popup.style.display = popup.style.display === "grid" ? "none"  : "grid";
