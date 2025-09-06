@@ -470,8 +470,8 @@ document.getElementById("Lock").addEventListener("click", () => {
 document.getElementById("Download").addEventListener("click", () => {
   const container = document.getElementById("galeria-imagens");
 
-  const width = container.offsetWidth;
-  const height = container.offsetHeight;
+  const width = 600;
+  const height = 600;
 
   const finalCanvas = document.createElement("canvas");
   finalCanvas.width = width;
