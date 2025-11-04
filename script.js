@@ -7,6 +7,8 @@ let corCat = {};
 let categoriaAtiva = null;
 let old_color = null;
 let cores = ["#ffffff"];
+let blink_hover = null;
+let timeflag = "true";
 
 const color_ref = 
 ["#ffffff","#e8e8e8","#d1d1d1","#bababa","#a3a3a3","#8c8c8c","#757575","#5e5e5e","#474747","#303030","#191919","#020202",
@@ -108,6 +110,10 @@ async function init() {
         img.classList.add("icon");
         img.src = `data/${enc(categoria)}/Icons/${i}.png`;
         img.alt = `${categoria} - ${i}`;
+
+        img.addEventListener("mouseover", () => {blink_hover = categoriaAtiva; setInterval(atualizarGaleria, 1000);});
+        img.addEventListener('mouseout', () => {blink_hover = null; atualizarGaleria;});
+
         item.appendChild(img);
       }
 
@@ -373,10 +379,19 @@ async function carregarCamadasSelecionadas(selecionados) {
     if (val <= 0) return null;
 
     const imagens = [];
+    const timestamp = Date.now();
 
     if (printOrder[catFolder][1] === 1) {
       const baseSrc = `data/${enc(categoria)}/${printOrder[catFolder][2]}/Base/${val}.png`;
-      const cor = corCat[categoria];
+      let cor = corCat[categoria];
+
+      if (idParaCategoria[blink_hover] === categoria){
+          if (timeflag === "true"){
+            timeflag = "false";
+            cor = {r: 0, g: 170, b: 255 };
+          } else timeflag = "true";
+      }
+      
       const baseImg = await recolorirImagem(baseSrc, cor);
       baseImg.alt = `${categoria} - ${printOrder[catFolder][2]} - ${val}`;
       baseImg.dataset.cat = categoria;
@@ -537,8 +552,12 @@ document.getElementById("Open").addEventListener("change", (event) => {
   reader.readAsText(file);
 });
 
-document.getElementById("Reset").addEventListener("click", (event) => {
-  reset();
+document.getElementById("Reset").addEventListener("click", () => {
+  
+    var userChoice = confirm("Tem certeza que deseja reiniciar?");
+    if (userChoice) {
+        reset();
+    }
 })
 
 
