@@ -9,6 +9,26 @@ body {
   height: 100vh; 
 }
 
+#front-page{
+  color-scheme: light dark;
+  background-color: light-dark(#f4f4f4, #222);
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 99999999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+input[type="button"][value="Start"]{
+  height: 80px;
+  width: 140px;
+  font-size: 25px;
+  color-scheme: light dark;
+  background-color: light-dark(#fff, #444);
+}
+
 .coluna {
   padding: 20px;
   overflow-y: auto;

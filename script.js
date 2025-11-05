@@ -7,8 +7,7 @@ let corCat = {};
 let categoriaAtiva = null;
 let old_color = null;
 let cores = ["#ffffff"];
-let blink_hover = null;
-let timeflag = "true";
+let blockRule = {};
 
 const color_ref = 
 ["#ffffff","#e8e8e8","#d1d1d1","#bababa","#a3a3a3","#8c8c8c","#757575","#5e5e5e","#474747","#303030","#191919","#020202",
@@ -39,6 +38,7 @@ async function init() {
   const json = await res.json();
 
   dados = Object.assign({}, ...json.Categoria);
+  blockRule = json.BlockRule;
 
   json.PrintOrder.forEach((item, index) => {
     printOrder[index] = item; 
@@ -70,8 +70,8 @@ async function init() {
       document.querySelectorAll("nav a").forEach(b => b.classList.remove("selecionado"));
       a.classList.add("selecionado");
     });
-
     if (idxCat === 0) a.classList.add("selecionado");
+
     const img = document.createElement("img");
     img.classList.add("menu");
     img.src = `data/${enc(categoria)}/${enc(categoria)}.png`;
@@ -110,10 +110,6 @@ async function init() {
         img.classList.add("icon");
         img.src = `data/${enc(categoria)}/Icons/${i}.png`;
         img.alt = `${categoria} - ${i}`;
-
-        img.addEventListener("mouseover", () => {blink_hover = categoriaAtiva; setInterval(atualizarGaleria, 1000);});
-        img.addEventListener('mouseout', () => {blink_hover = null; atualizarGaleria;});
-
         item.appendChild(img);
       }
 
@@ -217,6 +213,8 @@ function criarPopupCores() {
     grade.appendChild(btn);
   });
 
+  popup.style.display = "none";
+
   const confirmar = document.createElement("button");
   confirmar.textContent = "Confirmar";
   confirmar.classList.add("confirm-btn");
@@ -239,8 +237,6 @@ function criarPopupCores() {
 
   popup.appendChild(grade);
   popup.appendChild(controls);
-
-  popup.style.display = "none";
 }
 
 function updateMenuCores(){
@@ -272,6 +268,8 @@ function showCategory(catId) {
   const ativo = alvo.dataset.lock === "true";
   lock.classList.toggle("botao", ativo);
   lock.classList.toggle("botao-inativo", !ativo);
+
+  marcarVisual(catId, selecionados[idParaCategoria[catId]]);
 }
 
 function onItemClick(e) {
@@ -285,9 +283,73 @@ function onItemClick(e) {
   const atual = selecionados[categoria] || 0;
   const novoValor = (atual === idxClicado && idxClicado !== 0 && removeList[categoria]) ? 0 : idxClicado;
 
-  selecionados[categoria] = novoValor;
-  marcarVisual(catId, novoValor);
+  let wrap = { valor: novoValor };
+  checkLock(wrap);
+
+  selecionados[categoria] = wrap.valor;
+  marcarVisual(catId, wrap.valor);
   atualizarGaleria();
+}
+
+function checkLock(wrap){
+  const linha = blockRule[idParaCategoria[categoriaAtiva]];
+
+  if (linha != undefined) {
+    for (const coluna of Object.keys(linha)) {
+      if (linha[coluna][0].includes(wrap.valor)){
+          if (linha[coluna][1].includes(selecionados[coluna])){
+            var userChoice = confirm(`Essa escolha afetará a escolha de ${coluna}\nDeseja prosseguir?`);
+            if (userChoice) {
+              let i = dados[coluna][0];
+              let colunaLock = blockRule[coluna];
+              if (colunaLock != undefined && colunaLock[idParaCategoria[categoriaAtiva]] != undefined){
+                while (linha[coluna][1].includes(i) || colunaLock[idParaCategoria[categoriaAtiva]][0].includes(i)){
+                  i++;
+                }
+              } else {
+                while (linha[coluna][1].includes(i)){
+                  i++;
+                }
+              }
+
+              selecionados[coluna] = i;
+
+            } else {
+              wrap.valor = selecionados[idParaCategoria[categoriaAtiva]];
+              return;
+            }
+          }
+      }
+    }
+  }
+
+  Object.entries(blockRule).forEach(([nomeLinha, line]) => {
+    if (line[idParaCategoria[categoriaAtiva]]) {
+      if (line[idParaCategoria[categoriaAtiva]][1].includes(wrap.valor)){
+        if(line[idParaCategoria[categoriaAtiva]][0].includes(selecionados[nomeLinha])){
+          var userChoice = confirm(`Essa escolha afetará a escolha de ${nomeLinha}\nDeseja prosseguir?`);
+          if (userChoice) {
+              let i = dados[idParaCategoria[categoriaAtiva]][0];
+              let linhaLock = blockRule[idParaCategoria[categoriaAtiva]];
+              if (linhaLock != undefined && linhaLock[nomeLinha]!= undefined){
+                while (line[idParaCategoria[categoriaAtiva]][0].includes(i) || linhaLock[nomeLinha][1].includes(i)){
+                  i++;
+                }
+              } else {
+                while (line[idParaCategoria[categoriaAtiva]][0].includes(i)){
+                  i++;
+                }
+              }
+            selecionados[nomeLinha] = i;
+
+          } else {
+            wrap.valor = selecionados[idParaCategoria[categoriaAtiva]];
+            return;
+          }
+        }
+      }
+    }
+  });
 }
 
 function marcarVisual(catId, valor) {
@@ -379,19 +441,10 @@ async function carregarCamadasSelecionadas(selecionados) {
     if (val <= 0) return null;
 
     const imagens = [];
-    const timestamp = Date.now();
 
     if (printOrder[catFolder][1] === 1) {
       const baseSrc = `data/${enc(categoria)}/${printOrder[catFolder][2]}/Base/${val}.png`;
-      let cor = corCat[categoria];
-
-      if (idParaCategoria[blink_hover] === categoria){
-          if (timeflag === "true"){
-            timeflag = "false";
-            cor = {r: 0, g: 170, b: 255 };
-          } else timeflag = "true";
-      }
-      
+      let cor = corCat[categoria];   
       const baseImg = await recolorirImagem(baseSrc, cor);
       baseImg.alt = `${categoria} - ${printOrder[catFolder][2]} - ${val}`;
       baseImg.dataset.cat = categoria;
@@ -558,6 +611,11 @@ document.getElementById("Reset").addEventListener("click", () => {
     if (userChoice) {
         reset();
     }
+})
+
+document.getElementById("Start").addEventListener("click", () => {
+  const frontPage = document.getElementById("front-page");
+  frontPage.style.display = "none";
 })
 
 
