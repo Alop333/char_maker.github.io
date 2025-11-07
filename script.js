@@ -8,6 +8,7 @@ let categoriaAtiva = null;
 let old_color = null;
 let cores = ["#ffffff"];
 let blockRule = {};
+let size_select = 0;
 
 const color_ref = 
 ["#ffffff","#e8e8e8","#d1d1d1","#bababa","#a3a3a3","#8c8c8c","#757575","#5e5e5e","#474747","#303030","#191919","#020202",
@@ -134,6 +135,7 @@ async function init() {
     corCat = estado.corCat || {};
     cores = estado.cores || ["#ffffff"];
     document.getElementById("Name").value = estado.nome;
+    size_select = estado.size_select;
 
     categorias.forEach((categoria) => {
       const catId = idSeguro(categoria);
@@ -146,13 +148,12 @@ async function init() {
   updateMenuCores();
 
   if (categorias.length > 0) showCategory(idSeguro(categorias[0]));
+  var aux = document.getElementsByClassName('jsBtn');
+  [].forEach.call(aux, b => b.classList.remove('selecionado')); 
+  document.getElementById('Size_'+size_select).classList.add('selecionado');
 }
 
 async function reset() {
-  const res = await fetch("categorias.json");
-  const json = await res.json();
-  dados = Object.assign({}, ...json.Categoria);
-
   const categorias = Object.keys(dados);
   categorias.forEach((categoria) => {
     const inicial = dados[categoria][0];
@@ -169,6 +170,7 @@ async function reset() {
     selecionados[categoria] = Number(inicial) || 0;
     corCat[categoria] = hexToRgb("#ffffff");
   });
+  size_select = 0;
   cores = ["#ffffff"];
   document.getElementById("Name").value = "Nome Personagem";
 
@@ -369,6 +371,10 @@ function marcarVisual(catId, valor) {
   }
 }
 
+function marcarSize(){
+
+}
+
 function updateEstado(){
   const nome = document.getElementById("Name").value;
 
@@ -376,7 +382,8 @@ function updateEstado(){
     selecionados,
     corCat,
     cores,
-    nome
+    nome,
+    size_select
   };
   localStorage.setItem("estadoSite", JSON.stringify(estado));
 }
@@ -448,6 +455,23 @@ async function carregarCamadasSelecionadas(selecionados) {
       const baseImg = await recolorirImagem(baseSrc, cor);
       baseImg.alt = `${categoria} - ${printOrder[catFolder][2]} - ${val}`;
       baseImg.dataset.cat = categoria;
+
+      const image_size = document.getElementById("galeria-imagens");
+      const size_print = dados[categoria][4];
+
+      switch (size_select){
+        case 0:
+          break;
+        case 1:
+          baseImg.style.height = size_print[0][0] + "%";
+          baseImg.style.top = size_print[0][1]*image_size.offsetHeight/600 + "px";
+          break;
+        case 2:
+          baseImg.style.width = size_print[1][0] + "%";
+          baseImg.style.left = size_print[1][1]*image_size.offsetHeight/600 + "px";
+          break;
+      }
+
       imagens.push(baseImg);
     }
 
@@ -455,6 +479,25 @@ async function carregarCamadasSelecionadas(selecionados) {
     const linhasImg = await carregarImagem(linhasSrc);
     linhasImg.alt = `${categoria} - ${printOrder[catFolder][2]} - ${val}`;
     linhasImg.dataset.cat = categoria;
+
+    const image_size = document.getElementById("galeria-imagens");
+    const size_print = dados[categoria][4];
+
+    console.log(size_print[0][1] * image_size.offsetHeight/600);
+
+    switch (size_select){
+      case 0:
+        break;
+      case 1:
+        linhasImg.style.height = size_print[0][0] + "%";
+        linhasImg.style.top = size_print[0][1]* image_size.offsetHeight/600 + "px";
+        break;
+      case 2:
+        linhasImg.style.width = size_print[1][0] + "%";
+        linhasImg.style.left = size_print[1][1]* image_size.offsetHeight/600 + "px";
+        break;
+    }
+
     imagens.push(linhasImg);
 
     return { categoria, imagens };
@@ -498,7 +541,6 @@ document.getElementById("colorPop").addEventListener("click", () => {
   const rect = btn.getBoundingClientRect();
 
   if (popup.style.display === "grid"){
-    const color_p = document.getElementById("color");
     corCat[idParaCategoria[categoriaAtiva]] = old_color;
     atualizarGaleria();
   } else{
@@ -542,6 +584,7 @@ document.getElementById("Download").addEventListener("click", () => {
   const height = 600;
 
   const finalCanvas = document.createElement("canvas");
+
   finalCanvas.width = width;
   finalCanvas.height = height;
   const ctx = finalCanvas.getContext("2d");
@@ -549,11 +592,19 @@ document.getElementById("Download").addEventListener("click", () => {
   const elementos = container.querySelectorAll("img");
 
   elementos.forEach(el => {
+    const categoria = el.dataset.cat;
     if (el.tagName.toLowerCase() === "img") {
-      ctx.drawImage(el, 0, 0, width, height);
-    } else if (el.tagName.toLowerCase() === "canvas") {
-      ctx.drawImage(el, 0, 0, width, height);
-    }
+      switch (size_select){
+        case 0:
+          ctx.drawImage(el, 0, 0, width, height);
+          break;
+        case 1:
+          ctx.drawImage(el, 0, dados[categoria][4][size_select-1][1], width, height*dados[categoria][4][size_select-1][0]/100);
+          break;
+        case 2:
+          ctx.drawImage(el, dados[categoria][4][size_select-1][1], 0, width*dados[categoria][4][size_select-1][0]/100, height);
+          break;
+      }}
   });
 
   const link = document.createElement("a");
