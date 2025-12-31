@@ -9,6 +9,7 @@ let old_color = null;
 let cores = ["#ffffff"];
 let blockRule = {};
 let size_select = 0;
+let old_size = window.innerWidth;
 
 const color_ref = 
 ["#ffffff","#e8e8e8","#d1d1d1","#bababa","#a3a3a3","#8c8c8c","#757575","#5e5e5e","#474747","#303030","#191919","#020202",
@@ -143,14 +144,16 @@ async function init() {
     });
   }
 
-  atualizarGaleria();
   criarPopupCores();
   updateMenuCores();
+  
+  await atualizarGaleria();
 
   if (categorias.length > 0) showCategory(idSeguro(categorias[0]));
-  var aux = document.getElementsByClassName('jsBtn');
-  [].forEach.call(aux, b => b.classList.remove('selecionado')); 
-  document.getElementById('Size_'+size_select).classList.add('selecionado');
+
+  updateSize()
+
+  document.getElementById("Start").style.display = "grid";
 }
 
 async function reset() {
@@ -174,6 +177,7 @@ async function reset() {
   cores = ["#ffffff"];
   document.getElementById("Name").value = "Nome Personagem";
 
+  updateSize()
   atualizarGaleria();
   updateMenuCores();
 }
@@ -244,6 +248,12 @@ function criarPopupCores() {
 function updateMenuCores(){
   const menu = document.getElementById("menu-cores");
   menu.innerHTML = "";
+
+  const uniq =[... new Set(cores)];
+  cores = [];
+  for (const cor of uniq){
+    cores.push(cor);
+  }
 
   cores.forEach(cor => {
     const div = document.createElement("div");
@@ -483,8 +493,6 @@ async function carregarCamadasSelecionadas(selecionados) {
     const image_size = document.getElementById("galeria-imagens");
     const size_print = dados[categoria][4];
 
-    console.log(size_print[0][1] * image_size.offsetHeight/600);
-
     switch (size_select){
       case 0:
         break;
@@ -521,6 +529,13 @@ async function atualizarGaleria() {
   const camadas = await carregarCamadasSelecionadas(selecionados);
   renderizarCamadas(gal, camadas);
   updateEstado();
+}
+
+function updateSize() {
+  atualizarGaleria(); 
+  var aux = document.getElementsByClassName('jsBtn'); 
+  [].forEach.call(aux, b => b.classList.remove('selecionado')); 
+  document.getElementById('Size_'+size_select).classList.add('selecionado');
 }
 
 /*document.getElementById("colorSubmit").addEventListener("click", () => {
@@ -617,7 +632,8 @@ document.getElementById("Save").addEventListener("click", () => {
   const estado = {
     selecionados,
     corCat,
-    cores
+    cores,
+    size_select
   };
 
   const blob = new Blob([JSON.stringify(estado, null, 2)], { type: "application/json" });
@@ -638,6 +654,7 @@ document.getElementById("Open").addEventListener("change", (event) => {
     selecionados = conteudo.selecionados || {};
     corCat = conteudo.corCat || {};
     cores = conteudo.cores || {};
+    size_select = conteudo.size_select || 0;
 
     const categorias = Object.keys(selecionados);
     categorias.forEach((categoria) => {
@@ -645,6 +662,7 @@ document.getElementById("Open").addEventListener("change", (event) => {
       marcarVisual(catId, selecionados[categoria]);
     });
 
+    updateSize()
     atualizarGaleria();
     updateMenuCores();
 
@@ -668,6 +686,17 @@ document.getElementById("Start").addEventListener("click", () => {
   const frontPage = document.getElementById("front-page");
   frontPage.style.display = "none";
 })
+
+window.addEventListener("resize", () =>{
+  if (old_size >= 1450 && window.innerWidth < 1450){
+    atualizarGaleria();
+    old_size = window.innerWidth;
+  }
+  else if (old_size < 1450 && window.innerWidth >= 1450){
+    atualizarGaleria();
+    old_size = window.innerWidth;
+  }
+});
 
 
 window.addEventListener("DOMContentLoaded", init);

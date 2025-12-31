@@ -14,9 +14,9 @@
   <div class="container">
     <div class="coluna image">
       <div id="size_button_wrapper">
-        <input type="button" class="jsBtn" id="Size_0" title="Normal" onclick="size_select=0; atualizarGaleria(); var aux = document.getElementsByClassName('jsBtn'); [].forEach.call(aux, b => b.classList.remove('selecionado')); document.getElementById('Size_0').classList.add('selecionado');">
-        <input type="button" class="jsBtn" id="Size_1" title="Mini" onclick="size_select=1; atualizarGaleria(); var aux = document.getElementsByClassName('jsBtn'); [].forEach.call(aux, b => b.classList.remove('selecionado')); document.getElementById('Size_1').classList.add('selecionado');">
-        <input type="button" class="jsBtn" id="Size_2" title="Big" onclick="size_select=2; atualizarGaleria(); var aux = document.getElementsByClassName('jsBtn'); [].forEach.call(aux, b => b.classList.remove('selecionado')); document.getElementById('Size_2').classList.add('selecionado');">
+        <input type="button" class="jsBtn" id="Size_0" title="Normal" onclick="size_select=0; updateSize();">
+        <input type="button" class="jsBtn" id="Size_1" title="Mini" onclick="size_select=1; updateSize();">
+        <input type="button" class="jsBtn" id="Size_2" title="Big" onclick="size_select=2; updateSize();">
       </div>
       <div id="galeria-imagens"></div>
       <div id="button_wrapper">
